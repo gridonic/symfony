@@ -12,7 +12,7 @@
 namespace Symfony\Component\Security\Core\Tests\Authentication\Provider;
 
 use Symfony\Component\Security\Core\Authentication\Provider\RememberMeAuthenticationProvider;
-use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
+use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Role\Role;
 
 class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
@@ -45,13 +45,14 @@ class RememberMeAuthenticationProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Symfony\Component\Security\Core\Exception\AccountExpiredException
+     * @expectedException \Symfony\Component\Security\Core\Exception\DisabledException
      */
-    public function testAuthenticateWhenPostChecksFails()
+    public function testAuthenticateWhenPreChecksFails()
     {
         $userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
         $userChecker->expects($this->once())
-                    ->method('checkPostAuth')
+            ->method('checkPreAuth')
+            ->will($this->throwException(new DisabledException()))
                     ->will($this->throwException($this->getMock('Symfony\Component\Security\Core\Exception\AccountExpiredException', null, array(), '', false)))
         ;
 
